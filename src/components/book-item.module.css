@@ -1,0 +1,25 @@
+.container {
+  display: flex; /* 수평 정렬 */
+  gap: 15px; /* 요소 사이의 간격 */
+  padding: 20px 10px;
+  border-bottom: 1px solid rgb(220, 220, 220);
+
+  color: black;
+  text-decoration: none;
+}
+
+.container img {
+  width: 80px;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.sub-title {
+  word-break: keep-all; /* 단어가 길어지면 줄바꿈을 하지 않음 */
+}
+
+.author {
+  color: gray;
+}

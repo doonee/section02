@@ -12,7 +12,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "paths": {
+    "paths": { /* src 경로앞에 @ 붙임 */
       "@/*": ["./src/*"]
     }
   },
