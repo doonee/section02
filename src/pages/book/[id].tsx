@@ -1,3 +1,7 @@
+import fetchOneBook from "@/lib/fetch-one-book";
+import { GetStaticPropsContext, InferGetStaticPropsType } from "next";
+import Head from "next/head";
+import { useRouter } from "next/router";
 import style from "./[id].module.css";
 
 const mockData = {
@@ -12,12 +16,64 @@ const mockData = {
     "https://shopping-phinf.pstatic.net/main_3888828/38888282618.20230913071643.jpg",
 };
 
-export default function Book() {
+export const getStaticPaths = async () => {
+  return {
+    paths: [
+      { params: { id: "1" } }, // id가 1인 페이지를 미리 렌더링
+      { params: { id: "2" } }, // id가 2인 페이지를 미리 렌더링
+      { params: { id: "3" } }, // 반드시 id가 문자열이어야 한다.
+    ],
+    fallback: true, // 대체, 대비책, 보험: false - 404 에러, true - 빈 화면, blocking - 로딩 화면
+  };
+};
+
+export const getStaticProps = async (context: GetStaticPropsContext) => {
+  const id = context.params!.id; // !: 값이 무조건 있다고 확신할 때 사용
+  const book = await fetchOneBook(Number(id));
+
+  if (!book) {
+    return {
+      notFound: true, // 404 에러
+    };
+  }
+
+  return {
+    props: { book },
+  };
+};
+
+export default function Book({
+  book,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
+  const router = useRouter();
+  if (router.isFallback) {
+    return (
+      <>
+        <Head>
+          <title>도서 상세</title>
+          <meta property="og:image" content="/thumbnail.png" />
+          <meta property="og:title" content="도서 상세" />
+          <meta property="og:description" content="도서 상세 페이지입니다." />
+        </Head>
+        <div>로딩 중...</div>
+      </>
+    );
+  }
+  if (!book) {
+    return "문제가 발생했습니다. 다시 시도해주세요.";
+  }
+
   const { id, title, subTitle, description, author, publisher, coverImgUrl } =
-    mockData;
+    book;
 
   return (
     <div className={style.container}>
+      <Head>
+        <title>{title}</title>
+        <meta property="og:image" content={coverImgUrl} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+      </Head>
       <div
         className={style.cover_image_container}
         style={{ backgroundImage: `url(${coverImgUrl})` }}
